@@ -84,29 +84,34 @@ with tab1:
         
         
     labels = [choose3, choose4, choose5, choose6, choose7, choose8, choose9, choose10, choose11, choose12]
+    m = len(labels)
+    true = []
     
-        
-    if choose8:
-        df = df[df['CLASS'].str[2:6] == 'CTIN']
-    elif choose10:
-        df = df[df['CLASS'].str[2:6] == 'CTRN']
-    elif choose4:
-        df = df[df['CLASS'].str[2:5].isin(['CT1', 'CT2'])]
-    elif choose9: 
-        df = df[df['CLASS'].str[2:5] == 'CSD']
-    elif choose3:
-        df = df[df['CLASS'].str[2:4] == 'CV']
-    elif choose5:
-        df = df[df['CLASS'].str[2:4] == 'CL']
-    elif choose6:
-        df = df[df['CLASS'].str[2:4] == 'CH']
-    elif choose7:
-        df = df[df['CLASS'].str[2:4] == 'CA']
-    elif choose11:
-        df = df[df['CLASS'].str[2:4].isin(['TH', 'SN'])]
-    elif choose12:
-        df = df[df['CLASS'].str[2].isin(['A', 'B'])]
-        
+    for i in range(m):
+        if (labels[i] == True):
+            true.append(i)
+            
+    for i in range(len(true)):
+        if (true[i] == 0):
+            df = df[df['CLASS'].str[2:4] == 'CV']
+        if (true[i] == 1):
+            df = df[df['CLASS'].str[2:5].isin(['CT1', 'CT2'])]
+        if (true[i] == 2):
+            df = df[df['CLASS'].str[2:4] == 'CL']
+        if (true[i] == 3):
+            df = df[df['CLASS'].str[2:4] == 'CH']
+        if (true[i] == 4):
+            df = df[df['CLASS'].str[2:4] == 'CA']
+        if (true[i] == 5):
+            df = df[df['CLASS'].str[2:6] == 'CTIN']
+        if (true[i] == 6):
+            df = df[df['CLASS'].str[2:5] == 'CSD']
+        if (true[i] == 7):
+            df = df[df['CLASS'].str[2:6] == 'CTRN']
+        if (true[i] == 8):
+            df = df[df['CLASS'].str[2:4].isin(['TH', 'SN'])]
+        if (true[i] == 9):
+            df = df[df['CLASS'].str[2].isin(['A', 'B'])]        
         
     st.dataframe(df)
     
