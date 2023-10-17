@@ -33,8 +33,7 @@ with tab1:
     with col9:
         choose11 = st.checkbox("TH/SN")
         choose12 = st.checkbox("Khác")
-    st.write("Số HS: ")
-    st.write("GPA: cao nhất, thấp nhất, trung bình")
+    
 with tab2:
     tab_A, tab_B = st.tabs(["Số lượng HS", "Điểm"])
     
