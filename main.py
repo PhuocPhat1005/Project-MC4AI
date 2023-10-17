@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
+# Xử lý và loại bỏ giá trị NULL trong dataframe
 df = pd.read_csv('py4ai-score.csv')
 df['S1'].fillna(0, inplace=True)
 df['S2'].fillna(0, inplace=True)
@@ -19,6 +20,7 @@ df['REG-MC4AI'].fillna('unknown', inplace=True)
 
 tab1, tab2, tab3, tab4 = st.tabs(["Danh sách", "Biểu đồ", "Phân nhóm", "Phân loại"])
 with tab1:
+    st.title('BẢNG ĐIỂM LỚP PY4AI 09/2022')
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.write("Giới tính")
@@ -51,16 +53,62 @@ with tab1:
         choose12 = st.checkbox("Khác")
         
     if choose1 and choose2:
-        st.dataframe(df)
+        df = df
     elif choose1:
         df = df[df['GENDER'].str.contains('M')]
-        st.dataframe(df)
     elif choose2:
         df = df[df['GENDER'].str.contains('F')]
-        st.dataframe(df)
 
-    if radio == 'Lớp 10':
+    if radio == 'Tát cả':
+        df = df
+    elif radio == 'Lớp 10':
+        df = df[df['CLASS'].str.startswith('10')]
+    elif radio == 'Lớp 11':
+        df = df[df['CLASS'].str.startswith('11')]
+    elif radio == 'Lớp 12':
+        df = df[df['CLASS'].str.startswith('12')]
     
+    if option_1 == 'Tất cả':
+        df = df
+    elif option_1 == 'A114':
+        df = df[df['PYTHON-CLASS'].str.startswith('114')]
+    elif option_1 == 'A115':
+        df = df[df['PYTHON-CLASS'].str.startswith('115')]
+        
+    if (option_2 == ['Sáng', 'Chiều']) or (option_2 == ['Chiều', 'Sáng']):
+        df = df
+    elif option_2 == ['Sáng']:
+        df = df[df['PYTHON-CLASS'].str.contains('S')]
+    elif option_2 == ['Chiều']:
+        df = df[df['PYTHON-CLASS'].str.contains('C')]
+        
+        
+    labels = [choose3, choose4, choose5, choose6, choose7, choose8, choose9, choose10, choose11, choose12]
+    
+        
+    if choose8:
+        df = df[df['CLASS'].str[2:6] == 'CTIN']
+    elif choose10:
+        df = df[df['CLASS'].str[2:6] == 'CTRN']
+    elif choose4:
+        df = df[df['CLASS'].str[2:5].isin(['CT1', 'CT2'])]
+    elif choose9: 
+        df = df[df['CLASS'].str[2:5] == 'CSD']
+    elif choose3:
+        df = df[df['CLASS'].str[2:4] == 'CV']
+    elif choose5:
+        df = df[df['CLASS'].str[2:4] == 'CL']
+    elif choose6:
+        df = df[df['CLASS'].str[2:4] == 'CH']
+    elif choose7:
+        df = df[df['CLASS'].str[2:4] == 'CA']
+    elif choose11:
+        df = df[df['CLASS'].str[2:4].isin(['TH', 'SN'])]
+    elif choose12:
+        df = df[df['CLASS'].str[2].isin(['A', 'B'])]
+        
+        
+    st.dataframe(df)
     
 with tab2:
     tab_A, tab_B = st.tabs(["Số lượng HS", "Điểm"])
