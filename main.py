@@ -1,6 +1,9 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import plotly.express as px
+import matplotlib.pyplot as plt
+
 
 # Xử lý và loại bỏ giá trị NULL trong dataframe
 df = pd.read_csv('py4ai-score.csv')
@@ -18,9 +21,10 @@ df['S10'].fillna(0, inplace=True)
 df['BONUS'].fillna(0, inplace=True)
 df['REG-MC4AI'].fillna('unknown', inplace=True)
 
+st.title('BẢNG ĐIỂM LỚP PY4AI 09/2022')
+
 tab1, tab2, tab3, tab4 = st.tabs(["Danh sách", "Biểu đồ", "Phân nhóm", "Phân loại"])
 with tab1:
-    st.title('BẢNG ĐIỂM LỚP PY4AI 09/2022')
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.write("Giới tính")
@@ -151,3 +155,15 @@ with tab1:
     
 with tab2:
     tab_A, tab_B = st.tabs(["Số lượng HS", "Điểm"])
+    with tab_A:
+        name_class = ['114-S', '114-C', '115-S', '115-C']
+        count_114S = len(df[df['PYTHON-CLASS'] == '114-S'])
+        count_114C = len(df[df['PYTHON-CLASS'] == '114-C'])
+        count_115S = len(df[df['PYTHON-CLASS'] == '115-S'])
+        count_115C = len(df[df['PYTHON-CLASS'] == '115-C'])
+        sizes = [count_114S, count_114C, count_115S, count_115C]
+        fig, ax = plt.subplots()
+        ax.pie(sizes, autopct='%1.1f%%', startangle = 180)
+        ax.axis('equal')
+        plt.legend(name_class, title="Danh sách", prop={'size': 8})
+        st.pyplot(fig)
