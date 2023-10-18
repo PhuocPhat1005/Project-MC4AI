@@ -4,6 +4,7 @@ import pandas as pd
 
 # Xử lý và loại bỏ giá trị NULL trong dataframe
 df = pd.read_csv('py4ai-score.csv')
+
 df['S1'].fillna(0, inplace=True)
 df['S2'].fillna(0, inplace=True)
 df['S3'].fillna(0, inplace=True)
@@ -16,7 +17,6 @@ df['S9'].fillna(0, inplace=True)
 df['S10'].fillna(0, inplace=True)
 df['BONUS'].fillna(0, inplace=True)
 df['REG-MC4AI'].fillna('unknown', inplace=True)
-    
 
 tab1, tab2, tab3, tab4 = st.tabs(["Danh sách", "Biểu đồ", "Phân nhóm", "Phân loại"])
 with tab1:
@@ -84,37 +84,70 @@ with tab1:
         
         
     labels = [choose3, choose4, choose5, choose6, choose7, choose8, choose9, choose10, choose11, choose12]
-    m = len(labels)
-    true = []
+    filter_conditions = {
+        0: df['CLASS'].str[2:4].isin(['CV']),
+        1: df['CLASS'].str[2:5].isin(['CT1', 'CT2', 'CT3']),
+        2: df['CLASS'].str[2:4].isin(['CL']),
+        3: df['CLASS'].str[2:4].isin(['CH']),
+        4: df['CLASS'].str[2:4].isin(['CA']),
+        5: df['CLASS'].str[2:6].isin(['CTIN']),
+        6: df['CLASS'].str[2:5].isin(['CSD']),
+        7: df['CLASS'].str[2:6].isin(['CTRN']),
+        8: df['CLASS'].str[2:4].isin(['TH', 'SN']),
+        9: df['CLASS'].str[2].isin(['A', 'B'])
+    }
     
-    for i in range(m):
-        if (labels[i] == True):
-            true.append(i)
+    num_true = sum(labels)
+
+    if num_true == 1:
+        index = labels.index(True)
+        df = df[filter_conditions[index]]
+    elif num_true == 2:
+        indices = [i for i, label in enumerate(labels) if label]
+        df = df[filter_conditions[indices[0]] | filter_conditions[indices[1]]]
+    elif num_true == 3:
+        indices = [i for i, label in enumerate(labels) if label]
+        df = df[filter_conditions[indices[0]] | filter_conditions[indices[1]] | filter_conditions[indices[2]]]
+    elif num_true == 4:
+        indices = [i for i, label in enumerate(labels) if label]
+        df = df[filter_conditions[indices[0]] | filter_conditions[indices[1]] | filter_conditions[indices[2]] | filter_conditions[indices[3]]]
+    elif num_true == 5:
+        indices = [i for i, label in enumerate(labels) if label]
+        df = df[filter_conditions[indices[0]] | filter_conditions[indices[1]] | filter_conditions[indices[2]] | filter_conditions[indices[3]] | filter_conditions[indices[4]]]
+    elif num_true == 6:
+        indices = [i for i, label in enumerate(labels) if label]
+        df = df[filter_conditions[indices[0]] | filter_conditions[indices[1]] | filter_conditions[indices[2]] | filter_conditions[indices[3]] | filter_conditions[indices[4]] | filter_conditions[indices[5]]]
+    elif num_true == 7:
+        indices = [i for i, label in enumerate(labels) if label]
+        df = df[filter_conditions[indices[0]] | filter_conditions[indices[1]] | filter_conditions[indices[2]] | filter_conditions[indices[3]] | filter_conditions[indices[4]] | filter_conditions[indices[5]] | filter_conditions[indices[6]]]
+    elif num_true == 8:
+        indices = [i for i, label in enumerate(labels) if label]
+        df = df[filter_conditions[indices[0]] | filter_conditions[indices[1]] | filter_conditions[indices[2]] | filter_conditions[indices[3]] | filter_conditions[indices[4]] | filter_conditions[indices[5]] | filter_conditions[indices[6]] | filter_conditions[indices[7]]]
+    elif num_true == 9: 
+        indices = [i for i, label in enumerate(labels) if label]
+        df = df[filter_conditions[indices[0]] | filter_conditions[indices[1]] | filter_conditions[indices[2]] | filter_conditions[indices[3]] | filter_conditions[indices[4]] | filter_conditions[indices[5]] | filter_conditions[indices[6]] | filter_conditions[indices[7]] | filter_conditions[indices[8]]]
+    elif num_true == 10:
+        indices = [i for i, label in enumerate(labels) if label]
+        df = df[filter_conditions[indices[0]] | filter_conditions[indices[1]] | filter_conditions[indices[2]] | filter_conditions[indices[3]] | filter_conditions[indices[4]] | filter_conditions[indices[5]] | filter_conditions[indices[6]] | filter_conditions[indices[7]] | filter_conditions[indices[8]] | filter_conditions[indices[9]]]
+        
+    cnt_1 = 0
+    cnt_2 = 0
+    for i in df.index:
+        c = df.loc[i, 'GENDER']
+        if c == 'M':
+            cnt_1 += 1
+        elif c == 'F':
+            cnt_2 += 1
             
-    for i in range(len(true)):
-        if (true[i] == 0):
-            df = df[df['CLASS'].str[2:4] == 'CV']
-        if (true[i] == 1):
-            df = df[df['CLASS'].str[2:5].isin(['CT1', 'CT2'])]
-        if (true[i] == 2):
-            df = df[df['CLASS'].str[2:4] == 'CL']
-        if (true[i] == 3):
-            df = df[df['CLASS'].str[2:4] == 'CH']
-        if (true[i] == 4):
-            df = df[df['CLASS'].str[2:4] == 'CA']
-        if (true[i] == 5):
-            df = df[df['CLASS'].str[2:6] == 'CTIN']
-        if (true[i] == 6):
-            df = df[df['CLASS'].str[2:5] == 'CSD']
-        if (true[i] == 7):
-            df = df[df['CLASS'].str[2:6] == 'CTRN']
-        if (true[i] == 8):
-            df = df[df['CLASS'].str[2:4].isin(['TH', 'SN'])]
-        if (true[i] == 9):
-            df = df[df['CLASS'].str[2].isin(['A', 'B'])]        
+    if df is not None:
+        students = len(df)
+        maxGPA = df['GPA'].max()
+        minGPA = df['GPA'].min()
+        averageGPA = round(df['GPA'].mean(), 1)
+        st.write('Số HS:', students, f' ({cnt_1} nam, {cnt_2} nữ)')
+        st.write('GPA: cao nhất', maxGPA, ', thấp nhất ', minGPA, ', trung bình', averageGPA)
         
     st.dataframe(df)
     
 with tab2:
     tab_A, tab_B = st.tabs(["Số lượng HS", "Điểm"])
-    
