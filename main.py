@@ -154,16 +154,81 @@ with tab1:
     st.dataframe(df)
     
 with tab2:
+    
     tab_A, tab_B = st.tabs(["Số lượng HS", "Điểm"])
+    
     with tab_A:
-        name_class = ['114-S', '114-C', '115-S', '115-C']
         count_114S = len(df[df['PYTHON-CLASS'] == '114-S'])
         count_114C = len(df[df['PYTHON-CLASS'] == '114-C'])
         count_115S = len(df[df['PYTHON-CLASS'] == '115-S'])
         count_115C = len(df[df['PYTHON-CLASS'] == '115-C'])
-        sizes = [count_114S, count_114C, count_115S, count_115C]
-        fig, ax = plt.subplots()
-        ax.pie(sizes, autopct='%1.1f%%', startangle = 180)
+        
+        chart_1 = [count_114S, count_114C, count_115S, count_115C]
+        name_class = []
+        sizes = []
+        conditions = {
+            0: '114-S',
+            1: '114-C',
+            2: '115-S',
+            3: '115-C'
+        }
+        
+        for i in range(len(chart_1)):
+            if chart_1[i] != 0:
+                name_class.append(conditions[i])
+                sizes.append(chart_1[i])
+        
+        fig, ax = plt.subplots(figsize = (6, 6))
+        ax.pie(sizes, autopct='%1.1f%%', startangle = 90)
         ax.axis('equal')
-        plt.legend(name_class, title="Danh sách", prop={'size': 8})
+        plt.legend(name_class, prop = {'size': 7}, loc = "upper right")
+        plt.title('BIỂU ĐỒ BIỂU DIỄN SỰ SO SÁNH SỐ LƯỢNG HỌC SINH TỪNG BUỔI HỌC')
+        st.pyplot(fig)
+         
+        conditions_1 = {
+            0: 'Chuyên Văn',
+            1: 'Chuyên Toán',
+            2: 'Chuyên Lý',
+            3: 'Chuyên Hóa',
+            4: 'Chuyên Anh',
+            5: 'Chuyên Tin',
+            6: 'Chuyên Sử Địa',
+            7: 'Chuyên Trung Nhật',
+            8: 'Tích Hợp / Song Ngữ',
+            9: 'Khác'
+        }
+
+        name_class_1 = []
+        sizes_1 = []
+
+        count_0 = len(df[df['CLASS'].str[2:4].isin(['CV'])])
+        count_1 = len(df[df['CLASS'].str[2:5].isin(['CT1', 'CT2', 'CT3'])])
+        count_2 = len(df[df['CLASS'].str[2:4].isin(['CL'])])
+        count_3 = len(df[df['CLASS'].str[2:4].isin(['CH'])])
+        count_4 = len(df[df['CLASS'].str[2:4].isin(['CA'])])
+        count_5 = len(df[df['CLASS'].str[2:6].isin(['CTIN'])])
+        count_6 = len(df[df['CLASS'].str[2:5].isin(['CSD'])])
+        count_7 = len(df[df['CLASS'].str[2:6].isin(['CTRN'])])
+        count_8 = len(df[df['CLASS'].str[2:4].isin(['TH', 'SN'])])
+        count_9 = len(df[df['CLASS'].str[2].isin(['A', 'B'])])
+
+        for i in range(len(conditions_1)):
+            if locals()[f'count_{i}'] != 0:
+                name_class_1.append(conditions_1[i])
+                sizes_1.append(locals()[f'count_{i}'])
+                
+        fig, ax = plt.subplots(figsize = (6, 6))
+        ax.pie(sizes_1, autopct = '%1.1f%%' , startangle = 90)
+        ax.axis('equal')
+        if len(name_class_1) == 1:
+            plt.legend(name_class_1, prop={'size': 7}, loc='upper right')
+        elif len(name_class_1) == 2:
+            plt.legend(name_class_1, prop={'size': 6}, loc='upper right')
+        elif len(name_class_1) == 3:
+            plt.legend(name_class_1, prop={'size': 6}, loc='upper right')
+        elif len(name_class_1) == 4:
+            plt.legend(name_class_1, prop={'size': 6}, loc='upper right')
+        elif len(name_class_1) == 5:
+            plt.legend(name_class_1, prop={'size': 6}, loc='upper right')
+        plt.title('BIỂU ĐỒ BIỂU DIỄN SỰ SO SÁNH SỐ LƯỢNG HỌC SINH TỪNG LỚP HỌC')
         st.pyplot(fig)
