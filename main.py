@@ -340,6 +340,12 @@ with tab2:
                     fig1.update_layout(title_x=0.1, title_y=0.9)
                     st.plotly_chart(fig1)
                     
+                    fig2 = px.bar(df[(df[f'S{i + 1}'] >= 0) & (df[f'S{i + 1}'] <= 10)], x ='CLASS-GROUP', y=f'S{i + 1}', color='GENDER', barmode = 'group', title = f'BIỂU ĐỒ SO SÁNH ĐIỂM SESSION {i + 1} GIỮA NAM VÀ NỮ TRONG LỚP HỌC')
+                    fig2.update_layout(title_x=0.2, title_y=0.9)
+                    st.plotly_chart(fig2)
+                    
+                    
+                
             if genre == 'GPA':
                 fig = px.box(df, x = 'PYTHON-CLASS', y = 'GPA', color = 'GENDER', title = 'BIỂU ĐỒ BIỂU DIỄN SỰ SO SÁNH ĐIỂM GPA GIỮA CÁC BUỔI HỌC')
                 fig.update_layout(title_x=0.1, title_y=0.9)
@@ -347,7 +353,17 @@ with tab2:
 
                 fig1 = px.box(df, x = 'CLASS-GROUP', y = 'GPA', title = 'BIỂU ĐỒ BIỂU ĐIỄN SỰ SO SÁNH ĐIỂM GPA GIỮA CÁC HỌC SINH TRONG LỚP')
                 fig1.update_layout(title_x=0.1, title_y=0.9)
-                st.plotly_chart(fig1)                
-
+                st.plotly_chart(fig1)
+ 
+                fig2 = px.bar(df[(df['GPA'] >= 0) & (df['GPA'] <= 10)], x = 'CLASS-GROUP', y = 'GPA', color = 'GENDER', barmode = 'group', title = 'BIỂU ĐỒ SO SÁNH ĐIỂM GPA GIỮA NAM VÀ NỮ TRONG LỚP HỌC')
+                fig2.update_layout(title_x=0.2, title_y=0.9)
+                st.plotly_chart(fig2)
+                
+            # Index = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10']
+            # fig = px.bar(df, x = Index, y = 'Index',  title = 'BIỂU ĐỒ SO SÁNH ĐIỂM GPA GIỮA NAM VÀ NỮ TRONG LỚP HỌC')
+            # fig.update_layout(title_x=0.1, title_y=0.9)
+            # st.plotly_chart(fig)
         else:
             st.warning('**The DataFrame is empty !!!**', icon = "⚠️")
+with tab3:
+    
