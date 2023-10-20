@@ -3,6 +3,9 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.neighbors import KNeighborsClassifier
+import time
 
 df = pd.read_csv('py4ai-score.csv')
 
@@ -152,6 +155,7 @@ with tab2:
     tab_A, tab_B = st.tabs(["**Số lượng HS**", "**Điểm**"])
     
     with tab_A:
+        st.balloons()
         if(len(df)) != 0:
             # Draw the pie chart 1
             count_114S = len(df[df['PYTHON-CLASS'] == '114-S'])
@@ -301,7 +305,7 @@ with tab2:
         
     with tab_B:
         if len(df) != 0:
-            
+            st.balloons()
             genre = st.radio("**Điểm từng thành phần**", ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "GPA"], horizontal = True)
             
             rank = []
@@ -365,5 +369,17 @@ with tab2:
             # st.plotly_chart(fig)
         else:
             st.warning('**The DataFrame is empty !!!**', icon = "⚠️")
+            
 with tab3:
-    
+    age = st.slider('Số nhóm được phân chia', 1, 1, 5)
+    X = df[['S1', 'S2', 'GPA']].values.copy()
+    for i in range(4):
+        if age == i:
+            kmeans = KMeans(n_clusters= i, n_init = 'auto')
+            kmeans.fit(X)
+            fig = px.scatter_3d(df, x = 'GPA', y = 'S1', z = 'S2', color = kmeans.labels_)
+            st.plotly_chart(fig)
+            
+            df['Cluster'] = kmeans.labels_
+            for j in range(i):
+                
