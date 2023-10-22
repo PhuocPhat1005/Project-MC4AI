@@ -5,7 +5,6 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.neighbors import KNeighborsClassifier
-import time
 
 df = pd.read_csv('py4ai-score.csv')
 
@@ -28,17 +27,17 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(["**Danh sách**", "**Biểu đồ**", "*
 with tab1:
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.write("**Giới tính**")
+        st.write(":blue[**Giới tính**]")
         choose1 = st.checkbox('Nam')
         choose2 = st.checkbox('Nữ')
     with col2:
-        radio = st.radio("**Khối lớp**", ["Tất cả", "Lớp 10", "Lớp 11", "Lớp 12"])
+        radio = st.radio(":blue[**Khối lớp**]", ["Tất cả", "Lớp 10", "Lớp 11", "Lớp 12"])
     with col3:
-        option_1 = st.selectbox('**Phòng**', ['Tất cả', 'A114', 'A115'], placeholder = "Choose an option")
+        option_1 = st.selectbox(':blue[**Phòng**]', ['Tất cả', 'A114', 'A115'], placeholder = "Choose an option")
     with col4:
-        option_2 = st.multiselect("**Buổi**", ["Sáng", "Chiều"], placeholder = "Choose an option")
+        option_2 = st.multiselect(":blue[**Buổi**]", ["Sáng", "Chiều"], placeholder = "Choose an option")
 
-    st.write("**Lớp chuyên**")
+    st.write(":blue[**Lớp chuyên**]")
 
     col5, col6, col7, col8, col9 = st.columns(5)
     with col5:
@@ -145,10 +144,11 @@ with tab1:
         maxGPA = df['GPA'].max()
         minGPA = df['GPA'].min()
         averageGPA = round(df['GPA'].mean(), 1)
-        st.write('**Số HS** :', students, f' ({cnt_1} nam, {cnt_2} nữ)')
-        st.write('**GPA** : cao nhất', maxGPA, ', thấp nhất ', minGPA, ', trung bình', averageGPA)
-        st.write('**Số HS đăng ký tiếp lớp MC-4AI** :', count_reg_Y, ', **không đăng ký tiếp lớp MC4AI** : ', count_reg_U)
-    st.dataframe(df)
+        st.write(':blue[**Số HS** :]', students, f' ({cnt_1} nam, {cnt_2} nữ)')
+        st.write(':blue[**GPA** :] cao nhất', maxGPA, ', thấp nhất ', minGPA, ', trung bình', averageGPA)
+        st.write(':blue[**Số HS đăng ký tiếp lớp MC-4AI** :]', count_reg_Y, ', :blue[**không đăng ký tiếp lớp MC4AI** :] ', count_reg_U)
+        st.write(':blue[**BẢNG DATAFRAME LỚP PY4AI:**]')
+        st.dataframe(df)
     
 with tab2:
     
@@ -371,15 +371,48 @@ with tab2:
             st.warning('**The DataFrame is empty !!!**', icon = "⚠️")
             
 with tab3:
-    age = st.slider('Số nhóm được phân chia', 1, 1, 5)
-    X = df[['S1', 'S2', 'GPA']].values.copy()
-    for i in range(4):
+    age = st.slider('**Số nhóm phân chia:**', 1, 1, 5)
+    st.info(f'**Thông tin cần thiết:**\n\n- **S6**: Điểm thi ***Giữa Kỳ*** Py4AI.\n\n- **S10**: Điểm thi ***Cuối Kỳ*** Py4AI.\n\n- **S-AVG**: Điểm ***Trung Bình*** giữa các cột **S1**, **S2**, **S3**, **S4**, **S5**, **S7**, **S8** và **S9**.', icon = "📂")
+    df['S-AVG'] = (df['S1'] + df['S2'] + df['S3'] + df['S4'] + df['S5'] + df['S7'] + df['S8'] + df['S9']) / 8
+    X = df[['S6', 'S10', 'S-AVG']].values.copy()
+    for i in range(1, 6):
         if age == i:
-            kmeans = KMeans(n_clusters= i, n_init = 'auto')
+            kmeans = KMeans(n_clusters=i, n_init = 'auto')
             kmeans.fit(X)
-            fig = px.scatter_3d(df, x = 'GPA', y = 'S1', z = 'S2', color = kmeans.labels_)
-            st.plotly_chart(fig)
-            
             df['Cluster'] = kmeans.labels_
-            for j in range(i):
-                
+            
+            tracer_mapping = {
+                0 : 'Group 1',
+                1 : 'Group 2',
+                2 : 'Group 3',
+                3 : 'Group 4',
+                4 : 'Group 5'
+            }
+            df['Cluster'] = df['Cluster'].map(tracer_mapping).sort_values(ascending=True)
+            fig = px.scatter_3d(df, x = 'S6', y = 'S10', z = 'S-AVG', color = 'Cluster', color_discrete_sequence=['red', 'green', 'blue', 'yellow', 'pink'], labels={'Cluster': 'Category'}, title = 'BIỂU ĐỒ BIỂU DIỄN SỰ PHÂN CHIA NHÓM HỌC SINH DỰA TRÊN ĐIỂM SỐ')
+            fig.update_layout(title_x=0.15, title_y=0.9)
+            st.plotly_chart(fig)
+            index = []
+            gpa = []
+            for j in range(1, i + 1):
+                df_new = df[df['Cluster'] == f'Group {j}']
+                df_new = df_new[['NAME', 'GENDER', 'CLASS', 'PYTHON-CLASS', 'GPA', 'S6', 'S10', 'S-AVG', 'Cluster']]
+                if df_new is not None:
+                    maxGPA = df_new['GPA'].max()
+                    minGPA = df_new['GPA'].min()
+                    averageGPA = round(df_new['GPA'].mean(), 2)
+                    index.append(j)
+                    gpa.append(averageGPA)
+                    st.write(f'**Nhóm 0{j}:**')
+                    st.write('**GPA** : cao nhất', maxGPA, ', thấp nhất ', minGPA, ', trung bình', averageGPA)
+
+                st.dataframe(df_new)
+            
+            index = np.array(index)
+            gpa = np.array(gpa)
+            
+            max_idx = gpa.argmax()
+            min_idx = gpa.argmin()
+            
+            st.success(f'**Kết luận**:\n\n- Nhóm **0{index[max_idx]}** có điểm số cao nhất trong **0{i}** nhóm (**GPA trung bình:** {gpa[max_idx]}).\n\n- Nhóm **0{index[min_idx]}** có điểm số thấp nhất trong **0{i}** nhóm (**GPA trung bình:** {gpa[min_idx]}).', icon = "✍️")
+            
