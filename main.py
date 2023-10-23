@@ -5,6 +5,8 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 
 df = pd.read_csv('py4ai-score.csv')
 
@@ -405,8 +407,9 @@ with tab3:
                     gpa.append(averageGPA)
                     st.write(f'**Nhóm 0{j}:**')
                     st.write('**GPA** : cao nhất', maxGPA, ', thấp nhất ', minGPA, ', trung bình', averageGPA)
-
-                st.dataframe(df_new)
+                    st.dataframe(df_new)
+                else:
+                    st.warning('**The DataFrame is empty !!!**', icon = "⚠️")
             
             index = np.array(index)
             gpa = np.array(gpa)
@@ -415,4 +418,48 @@ with tab3:
             min_idx = gpa.argmin()
             
             st.success(f'**Kết luận**:\n\n- Nhóm **0{index[max_idx]}** có điểm số cao nhất trong **0{i}** nhóm (**GPA trung bình:** {gpa[max_idx]}).\n\n- Nhóm **0{index[min_idx]}** có điểm số thấp nhất trong **0{i}** nhóm (**GPA trung bình:** {gpa[min_idx]}).', icon = "✍️")
-            
+
+with tab4:
+    radio = st.radio("**Chọn số đặc trưng:**", ['2', '3'], horizontal = True);
+    df['S-AVG'] = (df['S1'] + df['S2'] + df['S3'] + df['S4'] + df['S5'] + df['S7'] + df['S8'] + df['S9']) / 8
+    if radio == '2':
+        x_1 = df['S-AVG'].values.copy()
+        x_2 = df['S6'].values.copy()
+        y = []
+        for i, j in zip(x_1, x_2):
+            if i >= 5 and j >= 5:
+                y.append(1)
+            elif i + j >= 12:
+                y.append(1)
+            else:
+                y.append(0)
+        y = np.array(y)
+        X = np.concatenate((x_1.reshape(-1, 1), x_2.reshape(-1, 1)), axis = 1)
+        
+        model = LogisticRegression()
+        model.fit(X, y)
+        
+        weights = model.coef_[0]
+        bias = model.intercept_[0]
+        w1, w2 = weights
+        
+        x1 = np.array([0, 10])
+        x2 = -(x1*w1 + bias)/w2 
+
+        fig, ax = plt.subplots()
+        ax.plot(x1, x2, '-b')
+        ax.scatter(X[:, 0], X[:, 1], c = y)
+       
+        ax.set_xlabel('S-AVG')
+        ax.set_ylabel('S6')
+        ax.set_title('BIỂU ĐỒ BIỂU DIỄN SỰ PHÂN LOẠI HỌC SINH ĐẬU HAY RỚT')
+        
+        st.pyplot(fig)
+        
+        y_pred = model.predict(X)
+        
+        st.write('**SCORE:**', round(accuracy_score(y, y_pred), 2))
+        
+        
+        
+        
