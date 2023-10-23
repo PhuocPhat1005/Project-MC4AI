@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-# import plotly.express as px
+import plotly.express as px
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.neighbors import KNeighborsClassifier
