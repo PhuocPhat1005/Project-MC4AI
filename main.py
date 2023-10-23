@@ -7,6 +7,7 @@ from sklearn.cluster import KMeans
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
+import plotly.graph_objects as go
 
 df = pd.read_csv('py4ai-score.csv')
 
@@ -421,21 +422,20 @@ with tab3:
 
 with tab4:
     radio = st.radio("**Chọn số đặc trưng:**", ['2', '3'], horizontal = True);
-    df['S-AVG'] = (df['S1'] + df['S2'] + df['S3'] + df['S4'] + df['S5'] + df['S7'] + df['S8'] + df['S9']) / 8
+    x_1 = df['S-AVG'].values.copy()
+    x_2 = df['S6'].values.copy()
+    y = []
+    for i, j in zip(x_1, x_2):
+        if i >= 5 and j >= 5:
+            y.append(1)
+        elif i + j >= 12:
+            y.append(1)
+        else:
+            y.append(0)
+    df['ID'] = y
+    y = np.array(y)
+    X = np.concatenate((x_1.reshape(-1, 1), x_2.reshape(-1, 1)), axis = 1)
     if radio == '2':
-        x_1 = df['S-AVG'].values.copy()
-        x_2 = df['S6'].values.copy()
-        y = []
-        for i, j in zip(x_1, x_2):
-            if i >= 5 and j >= 5:
-                y.append(1)
-            elif i + j >= 12:
-                y.append(1)
-            else:
-                y.append(0)
-        y = np.array(y)
-        X = np.concatenate((x_1.reshape(-1, 1), x_2.reshape(-1, 1)), axis = 1)
-        
         model = LogisticRegression()
         model.fit(X, y)
         
@@ -459,7 +459,31 @@ with tab4:
         y_pred = model.predict(X)
         
         st.write('**SCORE:**', round(accuracy_score(y, y_pred), 2))
+    elif radio == '3':
+        X_1 = df[['S6', 'S10', 'S-AVG']]
+        y_1 = df['ID']
+        df1 = df[df['ID'] == 0]
+        X_2 = df1[['S6', 'S10', 'S-AVG']]
+        df2 = df[df['ID'] == 1]
+        X_3 = df2[['S6', 'S10', 'S-AVG']]
         
+        model1 = LogisticRegression()
+        model1.fit(X_1, y_1)
         
+        weights = model1.coef_[0]
+        bias = model1.intercept_[0]
+        w1, w2, w3 = weights
         
+        x_graph = np.linspace(X_1['S6'].min(), X_1['S6'].max(), 100)
+        y_graph = np.linspace(X_1['S10'].min(), X_1['S10'].max(), 100)
+
+        X_plane, Y_plane = np.meshgrid(x_graph, y_graph)
+        Z_plane = (-w1 * X_plane - w2 * Y_plane - bias) / w3
+        Z_plane = Z_plane.reshape(X_plane.shape)
+
+        fig = go.Figure(data=[go.Scatter3d(x = X_2['S6'], y = X_2['S10'], z = X_2['S-AVG'],  mode = 'markers'), go.Scatter3d(x = X_3['S6'], y = X_3['S10'], z = X_3['S-AVG'], mode = 'markers'), go.Surface(x = X_plane, y = Y_plane, z = Z_plane)])
+        fig.update_layout(title='BIỂU ĐỒ BIỂU DIỄN SỰ PHÂN LOẠI HỌC SINH NHIỀU ĐẶC TRƯNG')
+        fig.update_layout(title_x=0.15, title_y=0.9)
+        st.plotly_chart(fig)
         
+        st.write('**SCORE:**', round(model1.score(X_1, y_1), 2))
