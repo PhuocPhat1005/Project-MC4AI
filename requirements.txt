@@ -12,4 +12,4 @@ pyvi
 sklearn.cluster
 sklearn.neighbors
 sklearn.linear_model
-sklearn.linear_model
+sklearn.metrics
