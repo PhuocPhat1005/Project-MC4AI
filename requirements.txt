@@ -4,8 +4,5 @@ pandas
 plotly
 matplotlib
 scikit-learn
-face-recognition
 opencv-python
-Pillow
-sentence-transformers
-pyvi
+time
