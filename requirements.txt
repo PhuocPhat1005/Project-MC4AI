@@ -9,3 +9,7 @@ opencv-python
 Pillow
 sentence-transformers
 pyvi
+sklearn.cluster
+sklearn.neighbors
+sklearn.linear_model
+sklearn.linear_model
