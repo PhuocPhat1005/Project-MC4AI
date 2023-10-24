@@ -342,7 +342,7 @@ with tab2:
                     
             df['CLASS-GROUP'] = rank
             
-            for i in range(9):
+            for i in range(10):
                 if genre == f'S{i + 1}':
                     fig = px.box(df, x = 'PYTHON-CLASS', y = f'S{i + 1}', color = 'GENDER', title = f'BIỂU ĐỒ BIỂU DIỄN SỰ SO SÁNH ĐIỂM SESSION {i + 1} GIỮA CÁC BUỔI HỌC')
                     fig.update_layout(title_x=0.1, title_y=0.9)
