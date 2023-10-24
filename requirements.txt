@@ -5,3 +5,4 @@ plotly
 matplotlib
 scikit-learn
 opencv-python
+face-recognition
