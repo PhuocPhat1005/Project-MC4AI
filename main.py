@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-# import plotly.express as px
+import plotly.express as px
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.neighbors import KNeighborsClassifier
@@ -33,7 +33,7 @@ df['REG-MC4AI'].fillna('unknown', inplace=True)
 
 st.title(':rainbow[BẢNG ĐIỂM LỚP PY4AI 09/2022]')
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["**Danh sách**", "**Biểu đồ**", "**Phân nhóm**", "**Phân loại**", "**Điểm danh**"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["**Danh sách**", "**Biểu đồ**", "**Phân nhóm**", "**Phân loại**", "**Xem Điểm**"])
 with tab1:
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -165,7 +165,6 @@ with tab2:
     tab_A, tab_B = st.tabs(["**Số lượng HS**", "**Điểm**"])
     
     with tab_A:
-        st.balloons()
         if(len(df)) != 0:
             # Draw the pie chart 1
             count_114S = len(df[df['PYTHON-CLASS'] == '114-S'])
@@ -315,7 +314,6 @@ with tab2:
         
     with tab_B:
         if len(df) != 0:
-            st.balloons()
             genre = st.radio("**Điểm từng thành phần**", ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "GPA"], horizontal = True)
             
             rank = []
@@ -372,11 +370,6 @@ with tab2:
                 fig2 = px.bar(df[(df['GPA'] >= 0) & (df['GPA'] <= 10)], x = 'CLASS-GROUP', y = 'GPA', color = 'GENDER', barmode = 'group', title = 'BIỂU ĐỒ SO SÁNH ĐIỂM GPA GIỮA NAM VÀ NỮ TRONG LỚP HỌC')
                 fig2.update_layout(title_x=0.2, title_y=0.9)
                 st.plotly_chart(fig2)
-                
-            # Index = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10']
-            # fig = px.bar(df, x = Index, y = 'Index',  title = 'BIỂU ĐỒ SO SÁNH ĐIỂM GPA GIỮA NAM VÀ NỮ TRONG LỚP HỌC')
-            # fig.update_layout(title_x=0.1, title_y=0.9)
-            # st.plotly_chart(fig)
         else:
             st.warning('**The DataFrame is empty !!!**', icon = "⚠️")
             
@@ -496,30 +489,30 @@ with tab4:
         st.write('**SCORE:**', round(model1.score(X_1, y_1), 2))
         
 def face_register():
-    name = st.text_input('Input Name')
-    buffer = st.camera_input('Take a picture', key=1)
+    name = st.text_input('**Nhập Họ và Tên của bạn**')
+    buffer = st.camera_input('**Chụp hình ảnh**', key=1)
     if buffer is not None:
         if name == '':
-            st.error('Please input name')
+            st.error('Vui lòng nhập họ và tên của bạn !!!')
         else:
-            with st.spinner('Please wait...'):
+            with st.spinner('Xin hãy đợi trong giây lát ...'):
                 bytes_data = buffer.getvalue()
                 img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
                 faces = DeepFace.extract_faces(img)
                 if len(faces) == 0:
-                    st.error('Face not found')
+                    st.error('Không nhận diện được khuôn mặt')
                 elif len(faces) > 1:
-                    st.error('Only one face accepted')
+                    st.error('Chỉ có một khuôn mặt được đăng ký')
                 else:
                     face = np.uint8(faces[0]['face']*255)
                     face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
                     cv2.imwrite(f'faces/{name}.png', face)
-                    st.success('Register Done')
+                    st.success('Đăng ký khuôn mặt thành công !!!')
 
-def face_verify():
-    buffer = st.camera_input('Take a picture', key=2)
+def face_verify(df):
+    buffer = st.camera_input('Chụp hình ảnh', key=2)
     if buffer is not None:
-        with st.spinner('Please wait...'):
+        with st.spinner('Xin hãy đợi trong giây lát ...'):
             t = time.time()
             bytes_data = buffer.getvalue()
             img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
@@ -531,9 +524,13 @@ def face_verify():
                     similarity = 100 * cosine_similarity(emb['embedding'], reg_emb)
                     if similarity >= 70:
                         st.success(f'{name}: {round(similarity)}%')
-                        data = {'Name':[name], 'Time':[str(datetime.now())]}
-                        df = pd.DataFrame(data)
-                        df.to_csv('data.csv', index=None)
+                        data = {'Họ và Tên':[name], 'Thời gian Đăng ký':[str(datetime.now())]}
+                        df_new = pd.DataFrame(data)
+                        df_new.to_csv('data.csv', index=None)
+                        st.info(":red[**Bảng điểm chi tiết của học sinh**]", icon = "📊")
+                        df = df[df['NAME'] == name]
+                        st.dataframe(df)
+                        
                         break
             st.write(f'Process time: {round(time.time() - t, 3)}s')
 
@@ -546,11 +543,11 @@ def cosine_similarity(v1, v2):
     return np.dot(v1,v2) / (norm(v1)*norm(v2))        
 
 with tab5:
-    tabA1, tabB1, tabC1 = st.tabs(['Face Register', 'Face Verify', 'Time Log'])
+    tabA1, tabB1, tabC1 = st.tabs(['**Đăng ký Gương mặt**', '**Xem điểm học sinh**', '**Danh sách đăng ký**'])
     with tabA1:
         face_register()
     with tabB1:
-        face_verify()
+        face_verify(df)
     with tabC1:
         df_face = pd.read_csv('data.csv', index_col=None)
         st.dataframe(df_face)
